@@ -4,11 +4,19 @@ import { createProductRouter } from "./routes/product.ts";
 import { initializeDefaultAdmin } from "./services/authService.ts";
 
 const app = new Application();
+const authRouter = createAuthRouter();
+const productRouter = createProductRouter();
 
 app.use(async (ctx: Context, next: Next) => {
   ctx.response.headers.set("Access-Control-Allow-Origin", "*");
-  ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  ctx.response.headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS",
+  );
+  ctx.response.headers.set(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization",
+  );
   if (ctx.request.method === "OPTIONS") {
     ctx.response.status = 204;
     return;
@@ -16,11 +24,11 @@ app.use(async (ctx: Context, next: Next) => {
   await next();
 });
 
-app.use(createAuthRouter().routes());
-app.use(createAuthRouter().allowedMethods());
+app.use(authRouter.routes());
+app.use(authRouter.allowedMethods());
 
-app.use(createProductRouter().routes());
-app.use(createProductRouter().allowedMethods());
+app.use(productRouter.routes());
+app.use(productRouter.allowedMethods());
 
 await initializeDefaultAdmin();
 

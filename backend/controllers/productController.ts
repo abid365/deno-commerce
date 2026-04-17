@@ -1,22 +1,27 @@
 import { Context } from "oak";
-import { 
-  createProduct, 
-  getAllProducts, 
-  getProductById, 
-  updateProduct, 
-  deleteProduct 
+import {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
 } from "../services/productService.ts";
 import { CreateProductInput, UpdateProductInput } from "../types/product.ts";
 
-export async function getProductsController(ctx: Context): Promise<void> {
+function getProductIdFromPath(ctx: Context): string | undefined {
+  const segments = ctx.request.url.pathname.split("/").filter(Boolean);
+  return segments[segments.length - 1];
+}
+
+export function getProductsController(ctx: Context): void {
   const products = getAllProducts();
   ctx.response.status = 200;
   ctx.response.body = products;
 }
 
-export async function getProductController(ctx: Context): Promise<void> {
-  const id = ctx.params.id;
-  
+export function getProductController(ctx: Context): void {
+  const id = getProductIdFromPath(ctx);
+
   if (!id) {
     ctx.response.status = 400;
     ctx.response.body = { error: "Product ID is required" };
@@ -59,7 +64,7 @@ export async function createProductController(ctx: Context): Promise<void> {
 }
 
 export async function updateProductController(ctx: Context): Promise<void> {
-  const id = ctx.params.id;
+  const id = getProductIdFromPath(ctx);
 
   if (!id) {
     ctx.response.status = 400;
@@ -96,8 +101,8 @@ export async function updateProductController(ctx: Context): Promise<void> {
   ctx.response.body = product;
 }
 
-export async function deleteProductController(ctx: Context): Promise<void> {
-  const id = ctx.params.id;
+export function deleteProductController(ctx: Context): void {
+  const id = getProductIdFromPath(ctx);
 
   if (!id) {
     ctx.response.status = 400;
